@@ -16,8 +16,6 @@ class Function;
 
 // NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init)
 struct Code {
-  // TODO: Combine instructions and debug handles vector
-  // into std::vector<<std::pair<Instruction, DebugHandle>>
   std::vector<Instruction> instructions_;
   std::vector<DebugHandle> debug_handles_;
   std::vector<c10::OperatorName> op_names_;
@@ -35,21 +33,14 @@ struct InterpreterState {
  private:
   void enterFrame(const Code&);
   void leaveFrame();
-  void saveExceptionDebugHandle();
+  void saveExceptionDebugHandles();
 
   c10::IValue& reg(size_t reg);
   std::vector<c10::IValue> registers_;
   std::vector<Frame> frames_;
 };
 
-// Interpreter executes instruction in a loop one by one
-// from a list of instructions. PC is a program counter pointer
-// pointing to the current instruction being executed.
-// This function returns the current PC.
-// Note that this is set only when exception occurs.
-// since this is a thread local variable and setting it for
-// every instruction will add overhead of thread local variable access.
-DebugHandle getInterpretersExceptionDebugHandle();
+const std::vector<DebugHandle>& getInterpretersExceptionDebugHandles();
 } // namespace mobile
 } // namespace jit
 } // namespace torch
