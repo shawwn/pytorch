@@ -36,6 +36,7 @@
 #include <ATen/core/Array.h>
 #include <ATen/detail/FunctionTraits.h>
 #include <ATen/native/TensorIterator.h>
+#include <ATen/native/cuda/jit_utils.h>
 #include <c10/macros/Macros.h>
 #include <c10/core/ScalarType.h>
 #include <c10/util/TypeCast.h>
@@ -141,7 +142,7 @@ static inline void launch_vectorized_kernel(int64_t N, const func_t& f, array_t 
     }
   ); // if_constexpr
 
-  
+
 }
 
 template<bool jitting, typename func_t, typename array_t, typename inp_calc_t, typename out_calc_t, typename loader_t, typename storer_t>
@@ -156,6 +157,7 @@ static inline void launch_unrolled_kernel(int64_t N, const func_t& f, array_t da
     [&] (auto _) {  // then-case, jitting=true
       std::cout << "jitting is true!" << std::endl;
       std::cout << "launch_unrolled_kernel!" << std::endl;
+      at::cuda::jit::generate_code(N, ic, oc);
       // TODO: provide nvrtc scaffold
       // TODO: provide inline caching with (static?) pointers
     },
